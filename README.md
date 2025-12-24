@@ -43,8 +43,8 @@ Ikuti langkah berikut untuk menjalankan project di komputer lokal Anda:
 1.  **Clone Repository**
 
     ```bash
-    git clone https://github.com/username/repo-name.git
-    cd repo-name
+    git clone https://github.com/IbnnuuS/transjatim.git
+    cd transjatim
     ```
 
 2.  **Install Dependencies**
@@ -88,13 +88,12 @@ Ikuti langkah berikut untuk menjalankan project di komputer lokal Anda:
 
 ## 📸 Screenshots
 
-_(Tambahkan screenshot aplikasi di sini nanti)_
+<img width="1919" height="907" alt="image" src="https://github.com/user-attachments/assets/b395b5fc-cfea-4934-8d1c-8b00aba6cc6b" />
+<img width="1904" height="908" alt="image" src="https://github.com/user-attachments/assets/dbb40dc8-13bb-46ca-9888-ef1f7c678ede" />
+<img width="1903" height="908" alt="image" src="https://github.com/user-attachments/assets/14ca26c7-911e-43c7-98fb-4f23b2a09b1c" />
 
 ## 🔐 Keamanan
 
 -   **Role-based Access Control (RBAC)**: Middleware untuk membatasi akses Admin vs User.
 -   **Authorization Checks**: Proteksi ganda pada controller untuk mencegah _Privilege Escalation_ dan _IDOR_.
 
-## 📝 Lisensi
-
-Project ini dilisensikan di bawah [MIT license](https://opensource.org/licenses/MIT).
