@@ -1,4 +1,4 @@
-# 🚌 Sistem Monitoring Kinerja & Pelaporan (E-Laporan) - Trans Jatim
+# Sistem Monitoring Kinerja & Pelaporan (E-Laporan) - Trans Jatim
 
 ![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
@@ -120,21 +120,3 @@ npm run dev
 ```
 
 Akses aplikasi di: `http://localhost:8000`
-
-## 🔐 Akun Demo (Jika Menggunakan Seeding)
-
--   **Admin**: `admin@example.com` / `password`
--   **User**: `user@example.com` / `password`
-    _(Sesuaikan dengan data di `database/seeders/DatabaseSeeder.php`)_
-
-## 🤝 Kontribusi
-
-1.  Fork repository ini
-2.  Buat branch fitur baru (`git checkout -b fitur-baru`)
-3.  Commit perubahan (`git commit -m 'Menambahkan fitur xyz'`)
-4.  Push ke branch (`git push origin fitur-baru`)
-5.  Buat Pull Request
-
-## 📝 Lisensi
-
-Project ini dilisensikan di bawah [MIT License](https://opensource.org/licenses/MIT).
