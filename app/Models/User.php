@@ -5,42 +5,35 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * Kolom yang boleh diisi mass-assignment.
-     */
     protected $fillable = [
         'name',
         'email',
-        'username',          // opsional
-        'role',              // 'admin' | 'user'
-        'division',          // opsional: 'teknik' | 'digital' | 'customer service'
-        'avatar_url',        // opsional
-        'providers',         // opsional: json berisi ['password','google',...]
+        'username',
+        'role',
+        'division',
+        'divisi',
+        'avatar',
+        'avatar_url',   // tetap ada biar gak rusak modul lain
+        'providers',
         'password',
-        'last_login_at',     // diisi saat event login
-        'last_logout_at',    // diisi saat event logout (jika dipakai)
+        'full_name',
+        'birth_date',
+        'koridor',
+        'last_login_at',
+        'last_logout_at',
     ];
 
-    /**
-     * Disembunyikan saat serialisasi.
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Cast atribut.
-     * - password => hashed
-     * - last_login_at/last_logout_at => datetime
-     * - providers => array (jika kolom JSON ada)
-     */
     protected function casts(): array
     {
         return [
@@ -49,21 +42,36 @@ class User extends Authenticatable
             'last_login_at'     => 'datetime',
             'last_logout_at'    => 'datetime',
             'providers'         => 'array',
+            'birth_date'        => 'date',
         ];
     }
 
-    /**
-     * Helper: apakah user adalah admin?
-     */
     public function isAdmin(): bool
     {
         return ($this->role ?? '') === 'admin';
     }
 
     /**
-     * Accessor waktu login/logout mengikuti timezone app (di .env: APP_TIMEZONE).
-     * Blade contoh: {{ optional($user->last_login_at_local)?->format('d/m/Y H:i') }}
+     * ✅ Avatar URL helper (dipakai semua blade admin/user)
      */
+    public function getAvatarDisplayAttribute(): string
+    {
+        $raw = $this->avatar ?? $this->avatar_url ?? null;
+
+        // Debug Log
+        \Illuminate\Support\Facades\Log::info("Avatar Debug: Raw=[{$raw}]");
+
+        if (!$raw) return '/assets/img/profile-img.jpg';
+
+        $path = str_replace(['storage/', '/storage/', 'public/'], '', $raw);
+
+        \Illuminate\Support\Facades\Log::info("Avatar Debug: Path=[{$path}], Exists=[" . (Storage::disk('public')->exists($path) ? 'YES' : 'NO') . "]");
+
+        return Storage::disk('public')->exists($path)
+            ? '/storage/' . $path
+            : '/assets/img/profile-img.jpg';
+    }
+
     public function getLastLoginAtLocalAttribute()
     {
         $tz = config('app.timezone', 'UTC');
@@ -76,10 +84,6 @@ class User extends Authenticatable
         return $this->last_logout_at ? $this->last_logout_at->timezone($tz) : null;
     }
 
-    /**
-     * Accessor khusus WIB (Asia/Jakarta).
-     * Blade contoh: {{ optional($user->last_login_wib)?->format('d/m/Y H:i') }} WIB
-     */
     public function getLastLoginWibAttribute()
     {
         return $this->last_login_at ? $this->last_login_at->timezone('Asia/Jakarta') : null;

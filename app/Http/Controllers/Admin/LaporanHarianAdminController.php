@@ -33,7 +33,7 @@ class LaporanHarianAdminController extends Controller
             ->withQueryString();
 
         $summary = ['total' => (clone $base)->count()];
-        foreach (['to_do','pending','in_progress','verification','rework','delayed','cancelled','done'] as $st) {
+        foreach (['to_do', 'pending', 'in_progress', 'verification', 'rework', 'delayed', 'cancelled', 'done'] as $st) {
             $summary[$st] = (clone $base)->where('status', $st)->count();
         }
 
@@ -45,9 +45,9 @@ class LaporanHarianAdminController extends Controller
          * Jika nama kolomnya berbeda (misal: is_admin, level, type) bilang ya, nanti aku sesuaikan.
          */
         $users = User::where(function ($q) {
-                $q->whereNull('role')
-                  ->orWhere('role', 'user');
-            })
+            $q->whereNull('role')
+                ->orWhere('role', 'user');
+        })
             ->orderBy('name')
             ->get();
 
@@ -79,7 +79,7 @@ class LaporanHarianAdminController extends Controller
             ->get();
 
         $summary = ['total' => (clone $base)->count()];
-        foreach (['to_do','pending','in_progress','verification','rework','delayed','cancelled','done'] as $st) {
+        foreach (['to_do', 'pending', 'in_progress', 'verification', 'rework', 'delayed', 'cancelled', 'done'] as $st) {
             $summary[$st] = (clone $base)->where('status', $st)->count();
         }
 
@@ -101,12 +101,17 @@ class LaporanHarianAdminController extends Controller
 
     private function applyFilters($q, array $filters): void
     {
+        // ✅ Fix Duplicate: Exclude template tasks
+        $q->where(function ($w) {
+            $w->where('is_template', 0)->orWhereNull('is_template');
+        });
+
         if (!empty($filters['q'])) {
             $v = $filters['q'];
             $q->where(function ($w) use ($v) {
                 $w->where('judul', 'like', "%{$v}%")
-                  ->orWhereHas('jobdesk.user', fn($u) => $u->where('name', 'like', "%{$v}%"))
-                  ->orWhereHas('jobdesk', fn($j) => $j->where('division', 'like', "%{$v}%"));
+                    ->orWhereHas('jobdesk.user', fn($u) => $u->where('name', 'like', "%{$v}%"))
+                    ->orWhereHas('jobdesk', fn($j) => $j->where('division', 'like', "%{$v}%"));
             });
         }
 
@@ -118,7 +123,7 @@ class LaporanHarianAdminController extends Controller
             $safeUser = User::where('id', $filters['user_id'])
                 ->where(function ($q) {
                     $q->whereNull('role')
-                      ->orWhere('role', 'user');
+                        ->orWhere('role', 'user');
                 })
                 ->exists();
 
@@ -131,7 +136,7 @@ class LaporanHarianAdminController extends Controller
             $v = $filters['division'];
             $q->where(function ($w) use ($v) {
                 $w->whereHas('jobdesk', fn($j) => $j->where('division', $v))
-                  ->orWhereHas('jobdesk.user', fn($u) => $u->where('division', $v));
+                    ->orWhereHas('jobdesk.user', fn($u) => $u->where('division', $v));
             });
         }
 

@@ -58,16 +58,16 @@ class LaporanBulananAdminController extends Controller
         $total = (clone $base)->count();
         $summary = ['total' => $total];
 
-        $statusList = ['pending','in_progress','verification','rework','delayed','cancelled','done'];
+        $statusList = ['pending', 'in_progress', 'verification', 'rework', 'delayed', 'cancelled', 'done'];
         foreach ($statusList as $st) {
             $summary[$st] = (clone $base)->where('status', $st)->count();
         }
 
         // ✅ Teams hanya USER (bukan admin)
         $users = User::where(function ($q) {
-                $q->whereNull('role')
-                  ->orWhere('role', 'user');
-            })
+            $q->whereNull('role')
+                ->orWhere('role', 'user');
+        })
             ->orderBy('name')
             ->get();
 
@@ -117,7 +117,7 @@ class LaporanBulananAdminController extends Controller
         $total = $rows->count();
         $summary = ['total' => $total];
 
-        $statusList = ['pending','in_progress','verification','rework','delayed','cancelled','done'];
+        $statusList = ['pending', 'in_progress', 'verification', 'rework', 'delayed', 'cancelled', 'done'];
         foreach ($statusList as $st) {
             $summary[$st] = $rows->where('status', $st)->count();
         }
@@ -144,6 +144,11 @@ class LaporanBulananAdminController extends Controller
     {
         $q = JobdeskTask::with(['photos', 'jobdesk.user']);
 
+        // ✅ Fix Duplicate: Exclude template tasks
+        $q->where(function ($w) {
+            $w->where('is_template', 0)->orWhereNull('is_template');
+        });
+
         // ✅ Filter status (optional)
         if (!empty($filters['status'])) {
             $q->where('status', $filters['status']);
@@ -158,7 +163,7 @@ class LaporanBulananAdminController extends Controller
                 $sq->whereBetween(DB::raw('DATE(schedule_date)'), [$start, $end])
                     ->orWhere(function ($qq) use ($start, $end) {
                         $qq->whereNull('schedule_date')
-                           ->whereBetween(DB::raw('DATE(created_at)'), [$start, $end]);
+                            ->whereBetween(DB::raw('DATE(created_at)'), [$start, $end]);
                     });
             });
         }
@@ -178,7 +183,7 @@ class LaporanBulananAdminController extends Controller
             $safeUser = User::where('id', $filters['user_id'])
                 ->where(function ($qq) {
                     $qq->whereNull('role')
-                       ->orWhere('role', 'user');
+                        ->orWhere('role', 'user');
                 })
                 ->exists();
 

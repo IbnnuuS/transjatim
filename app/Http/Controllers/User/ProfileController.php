@@ -22,7 +22,6 @@ class ProfileController extends Controller
     public function update(Request $request)
     {
         $user = Auth::user();
-
         $isChangePassword = $request->get('action') === 'change_password';
 
         $rules = [
@@ -30,10 +29,7 @@ class ProfileController extends Controller
             'full_name'  => 'required|string|max:255',
             'email'      => 'required|email|unique:users,email,' . $user->id,
             'birth_date' => 'nullable|date',
-
-            // ✅ divisi baru
             'division'   => 'nullable|in:Teknik,Digital,Customer Service',
-
             'avatar'     => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ];
 
@@ -44,60 +40,79 @@ class ProfileController extends Controller
 
         $validated = $request->validate($rules);
 
-        DB::transaction(function () use ($request, $user, $validated, $isChangePassword) {
+        try {
+            DB::transaction(function () use ($request, $user, $validated, $isChangePassword) {
 
-            $oldDivision = $user->division ?? $user->divisi ?? null;
-            $newDivision = $validated['division'] ?? null;
+                $oldDivision = $user->division ?? $user->divisi ?? null;
+                $newDivision = $validated['division'] ?? null;
 
-            // ✅ Update field profil
-            $user->name       = $validated['name'];
-            $user->full_name  = $validated['full_name'];
-            $user->email      = $validated['email'];
-            $user->birth_date = $validated['birth_date'] ?? null;
+                $user->name       = $validated['name'];
+                $user->full_name  = $validated['full_name'];
+                $user->email      = $validated['email'];
+                $user->birth_date = $validated['birth_date'] ?? null;
 
-            // ✅ Sinkron user.division & user.divisi (jaga kompatibilitas)
-            if ($newDivision !== null) {
-                if (Schema::hasColumn('users', 'division')) $user->division = $newDivision;
-                if (Schema::hasColumn('users', 'divisi'))   $user->divisi   = $newDivision;
-            }
-
-            // ✅ Upload avatar
-            if ($request->hasFile('avatar')) {
-                if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
-                    Storage::disk('public')->delete($user->avatar);
-                }
-                $user->avatar = $request->file('avatar')->store('avatars', 'public');
-            }
-
-            // ✅ ganti password
-            if ($isChangePassword || $request->filled('password')) {
-                if (!Hash::check($request->input('current_password'), $user->password)) {
-                    throw new \Exception('Password sekarang tidak sesuai.');
-                }
-                $user->password = Hash::make($request->input('password'));
-            }
-
-            $user->save();
-
-            // ✅ Jika divisi berubah, update semua jobdesk user ini
-            if ($newDivision !== null && $oldDivision !== $newDivision) {
-                $jobdeskQuery = Jobdesk::where('user_id', $user->id);
-
-                if (Schema::hasColumn('jobdesks', 'division')) {
-                    $jobdeskQuery->update(['division' => $newDivision]);
+                if ($newDivision !== null) {
+                    if (Schema::hasColumn('users', 'division')) $user->division = $newDivision;
+                    if (Schema::hasColumn('users', 'divisi'))   $user->divisi   = $newDivision;
                 }
 
-                if (Schema::hasColumn('jobdesks', 'divisi')) {
-                    $jobdeskQuery->update(['divisi' => $newDivision]);
-                }
-            }
-        });
+                // ✅ Upload avatar
+                if ($request->hasFile('avatar')) {
 
-        $msg = $isChangePassword ? 'Password berhasil diperbarui.' : 'Profil berhasil diperbarui.';
-        if (!$isChangePassword && $request->filled('password')) {
-            $msg = 'Profil & password berhasil diperbarui.';
+                    // Hapus avatar lama (pastikan pathnya normal)
+                    $oldAvatar = $user->avatar;
+                    if ($oldAvatar) {
+                        $oldAvatar = str_replace(['storage/', 'public/'], '', $oldAvatar);
+                        if (Storage::disk('public')->exists($oldAvatar)) {
+                            Storage::disk('public')->delete($oldAvatar);
+                        }
+                    }
+
+                    // Simpan file baru
+                    $path = $request->file('avatar')->store('avatars', 'public');
+
+                    // ✅ SIMPAN YANG BENAR (avatars/xxx.jpg)
+                    $user->avatar = $path;
+
+                    // optional: update avatar_url juga biar tidak merusak modul lain
+                    if (Schema::hasColumn('users', 'avatar_url')) {
+                        $user->avatar_url = $path;
+                    }
+                }
+
+                // ✅ ganti password
+                if ($isChangePassword || $request->filled('password')) {
+                    if (!Hash::check($request->input('current_password'), $user->password)) {
+                        throw new \Exception('Password sekarang tidak sesuai.');
+                    }
+                    $user->password = Hash::make($request->input('password'));
+                }
+
+                $user->save();
+
+                // ✅ update jobdesk jika divisi berubah
+                if ($newDivision !== null && $oldDivision !== $newDivision) {
+                    $jobdeskQuery = Jobdesk::where('user_id', $user->id);
+
+                    if (Schema::hasColumn('jobdesks', 'division')) {
+                        $jobdeskQuery->update(['division' => $newDivision]);
+                    }
+
+                    if (Schema::hasColumn('jobdesks', 'divisi')) {
+                        $jobdeskQuery->update(['divisi' => $newDivision]);
+                    }
+                }
+            });
+
+            $msg = $isChangePassword ? 'Password berhasil diperbarui.' : 'Profil berhasil diperbarui.';
+            if (!$isChangePassword && $request->filled('password')) {
+                $msg = 'Profil & password berhasil diperbarui.';
+            }
+
+            return back()->with('success', $msg);
+
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
-
-        return back()->with('success', $msg);
     }
 }

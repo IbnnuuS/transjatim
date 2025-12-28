@@ -223,7 +223,7 @@
                     <li>
                         <a class="{{ navActive(['admin/laporan/harian*']) }}"
                             href="{{ url('/admin/laporan/harian') }}">
-                            <i class="bi bi-circle"></i><span>Detail Pekerjaan</span>
+                            <i class="bi bi-circle"></i><span>Laporan Harian</span>
                         </a>
                     </li>
 
@@ -231,7 +231,7 @@
                     <li>
                         <a class="{{ navActive(['admin/laporan/bulanan*']) }}"
                             href="{{ url('/admin/laporan/bulanan') }}">
-                            <i class="bi bi-circle"></i><span>Rekap Pekerjaan</span>
+                            <i class="bi bi-circle"></i><span>Rekap Bulanan</span>
                         </a>
                     </li>
 
@@ -239,7 +239,7 @@
                     <li>
                         <a class="{{ navActive(['admin/jobdesk', 'admin/jobdesk/index', 'admin/jobdesk?*']) }}"
                             href="{{ url('/admin/jobdesk') }}">
-                            <i class="bi bi-circle"></i><span>Monitoring Proyek</span>
+                            <i class="bi bi-circle"></i><span>Monitoring Jobdesk</span>
                         </a>
                     </li>
                 </ul>

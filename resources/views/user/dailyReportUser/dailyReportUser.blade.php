@@ -117,7 +117,9 @@
                     }
                 }
 
-                if (!$raw) return null;
+                if (!$raw) {
+                    return null;
+                }
 
                 // Jika sudah URL lengkap
                 if (preg_match('~^https?://~i', $raw)) {
@@ -131,11 +133,11 @@
     @endphp
 
     <div class="pagetitle">
-        <h1>Daily Summary</h1>
+        <h1>Laporan Harian</h1>
         <nav>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ route('dashboard.user') }}">Home</a></li>
-                <li class="breadcrumb-item active">Daily Summary</li>
+                <li class="breadcrumb-item active">Laporan Harian</li>
             </ol>
         </nav>
     </div>
@@ -272,7 +274,9 @@
 
                                         <td>
                                             <div class="small">
-                                                {{ fmtTime($t->start_time) }}@if(!empty($t->start_time) && !empty($t->end_time))–@endif{{ fmtTime($t->end_time) }}
+                                                {{ fmtTime($t->start_time) }}@if (!empty($t->start_time) && !empty($t->end_time))
+                                                    –
+                                                @endif{{ fmtTime($t->end_time) }}
                                             </div>
 
                                             @if (!empty($t->start_time) && !empty($t->end_time) && $rowMinutes > 0)
@@ -306,7 +310,8 @@
                                         {{-- ✅ Kolom Bukti Link --}}
                                         <td>
                                             @if ($proofLink)
-                                                <a href="{{ $proofLink }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                <a href="{{ $proofLink }}" target="_blank"
+                                                    class="btn btn-sm btn-outline-primary">
                                                     <i class="bi bi-link-45deg"></i> Lihat
                                                 </a>
                                             @else

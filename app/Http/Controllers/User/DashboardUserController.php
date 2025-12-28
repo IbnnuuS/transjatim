@@ -43,6 +43,9 @@ class DashboardUserController extends Controller
                 'jobdesk:id,user_id,assignment_id',
             ])
             ->whereHas('jobdesk', fn($q) => $q->where('user_id', $me->id))
+            ->where(function ($q) {
+                $q->where('is_template', 0)->orWhereNull('is_template');
+            })
             ->whereBetween(DB::raw('DATE(schedule_date)'), [
                 $startMonth->toDateString(),
                 $endMonth->toDateString(),

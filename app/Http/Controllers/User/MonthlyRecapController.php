@@ -76,6 +76,9 @@ class MonthlyRecapController extends Controller
             ->whereHas('jobdesk', fn($q) => $q->where('user_id', (int)$selectedId))
             ->whereDate('schedule_date', '>=', $from->toDateString())
             ->whereDate('schedule_date', '<=', $to->toDateString())
+            ->where(function ($q) {
+                $q->where('is_template', 0)->orWhereNull('is_template');
+            })
             ->orderBy('schedule_date')
             ->orderBy('start_time')
             ->orderBy('created_at')

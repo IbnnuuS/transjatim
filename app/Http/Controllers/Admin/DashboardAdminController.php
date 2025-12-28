@@ -29,42 +29,42 @@ class DashboardAdminController extends Controller
             if (!$fDiv) return;
 
             $q->where(function ($qDiv) use ($fDiv) {
-                $qDiv->whereHas('jobdesk', function($j) use ($fDiv) {
+                $qDiv->whereHas('jobdesk', function ($j) use ($fDiv) {
                     $jobdesksTable = (new \App\Models\Jobdesk())->getTable();
                     $hasDivisionJD = Schema::hasColumn($jobdesksTable, 'division');
                     $hasDivisiJD   = Schema::hasColumn($jobdesksTable, 'divisi');
 
-                    $j->where(function($wj) use ($fDiv, $jobdesksTable, $hasDivisionJD, $hasDivisiJD) {
+                    $j->where(function ($wj) use ($fDiv, $jobdesksTable, $hasDivisionJD, $hasDivisiJD) {
                         if ($hasDivisionJD && $hasDivisiJD) {
-                            $wj->where($jobdesksTable.'.division', $fDiv)
-                               ->orWhere($jobdesksTable.'.divisi', $fDiv);
+                            $wj->where($jobdesksTable . '.division', $fDiv)
+                                ->orWhere($jobdesksTable . '.divisi', $fDiv);
                         } elseif ($hasDivisionJD) {
-                            $wj->where($jobdesksTable.'.division', $fDiv);
+                            $wj->where($jobdesksTable . '.division', $fDiv);
                         } elseif ($hasDivisiJD) {
-                            $wj->where($jobdesksTable.'.divisi', $fDiv);
+                            $wj->where($jobdesksTable . '.divisi', $fDiv);
                         } else {
                             $wj->whereRaw('1=0');
                         }
                     });
                 })
-                ->orWhereHas('jobdesk.user', function($u) use ($fDiv) {
-                    $usersTable  = (new \App\Models\User())->getTable();
-                    $hasDivision = Schema::hasColumn($usersTable, 'division');
-                    $hasDivisi   = Schema::hasColumn($usersTable, 'divisi');
+                    ->orWhereHas('jobdesk.user', function ($u) use ($fDiv) {
+                        $usersTable  = (new \App\Models\User())->getTable();
+                        $hasDivision = Schema::hasColumn($usersTable, 'division');
+                        $hasDivisi   = Schema::hasColumn($usersTable, 'divisi');
 
-                    if ($hasDivision && $hasDivisi) {
-                        $u->where(function($wu) use ($usersTable, $fDiv) {
-                            $wu->where($usersTable.'.division', $fDiv)
-                               ->orWhere($usersTable.'.divisi', $fDiv);
-                        });
-                    } elseif ($hasDivision) {
-                        $u->where($usersTable.'.division', $fDiv);
-                    } elseif ($hasDivisi) {
-                        $u->where($usersTable.'.divisi', $fDiv);
-                    } else {
-                        $u->whereRaw('1=0');
-                    }
-                });
+                        if ($hasDivision && $hasDivisi) {
+                            $u->where(function ($wu) use ($usersTable, $fDiv) {
+                                $wu->where($usersTable . '.division', $fDiv)
+                                    ->orWhere($usersTable . '.divisi', $fDiv);
+                            });
+                        } elseif ($hasDivision) {
+                            $u->where($usersTable . '.division', $fDiv);
+                        } elseif ($hasDivisi) {
+                            $u->where($usersTable . '.divisi', $fDiv);
+                        } else {
+                            $u->whereRaw('1=0');
+                        }
+                    });
             });
         };
 
@@ -75,15 +75,15 @@ class DashboardAdminController extends Controller
 
         $applySearch = function ($q) use ($fQ) {
             if ($fQ === '') return;
-            $like = '%'.$fQ.'%';
-            $q->where(function($w) use ($like) {
+            $like = '%' . $fQ . '%';
+            $q->where(function ($w) use ($like) {
                 $w->where('judul', 'like', $like)
-                  ->orWhere('result', 'like', $like)
-                  ->orWhere('detail', 'like', $like)
-                  ->orWhere('shortcoming', 'like', $like)
-                  ->orWhereHas('jobdesk.user', function($u) use ($like) {
-                      $u->where('name', 'like', $like);
-                  });
+                    ->orWhere('result', 'like', $like)
+                    ->orWhere('detail', 'like', $like)
+                    ->orWhere('shortcoming', 'like', $like)
+                    ->orWhereHas('jobdesk.user', function ($u) use ($like) {
+                        $u->where('name', 'like', $like);
+                    });
             });
         };
 
@@ -92,12 +92,15 @@ class DashboardAdminController extends Controller
 
         // ===== Weekly Done =====
         $tasksDoneWeekQuery = JobdeskTask::query()
-            ->where(function($q) use ($weekStart) {
+            ->where(function ($q) use ($weekStart) {
                 $q->whereDate('schedule_date', '>=', $weekStart->toDateString())
-                  ->orWhere(function($qq) use ($weekStart){
-                      $qq->whereNull('schedule_date')
-                         ->where('created_at', '>=', $weekStart->copy()->startOfDay());
-                  });
+                    ->orWhere(function ($qq) use ($weekStart) {
+                        $qq->whereNull('schedule_date')
+                            ->where('created_at', '>=', $weekStart->copy()->startOfDay());
+                    });
+            })
+            ->where(function ($q) {
+                $q->where('is_template', 0)->orWhereNull('is_template');
             });
 
         $applyDivision($tasksDoneWeekQuery);
@@ -109,12 +112,15 @@ class DashboardAdminController extends Controller
             : (clone $tasksDoneWeekQuery)->where('status', 'done')->count();
 
         $totalWeekTasksQuery = JobdeskTask::query()
-            ->where(function($q) use ($weekStart){
+            ->where(function ($q) use ($weekStart) {
                 $q->whereDate('schedule_date', '>=', $weekStart->toDateString())
-                  ->orWhere(function($qq) use ($weekStart){
-                      $qq->whereNull('schedule_date')
-                         ->where('created_at', '>=', $weekStart->copy()->startOfDay());
-                  });
+                    ->orWhere(function ($qq) use ($weekStart) {
+                        $qq->whereNull('schedule_date')
+                            ->where('created_at', '>=', $weekStart->copy()->startOfDay());
+                    });
+            })
+            ->where(function ($q) {
+                $q->where('is_template', 0)->orWhereNull('is_template');
             });
 
         $applyDivision($totalWeekTasksQuery);
@@ -130,7 +136,11 @@ class DashboardAdminController extends Controller
         $startDayUtc = $startDayWib->copy()->timezone('UTC');
         $endDayUtc   = $endDayWib->copy()->timezone('UTC');
 
-        $dailyTodayBase = JobdeskTask::query()->whereBetween('created_at', [$startDayUtc, $endDayUtc]);
+        $dailyTodayBase = JobdeskTask::query()
+            ->whereBetween('created_at', [$startDayUtc, $endDayUtc])
+            ->where(function ($q) {
+                $q->where('is_template', 0)->orWhereNull('is_template');
+            });
         $applyDivision($dailyTodayBase);
         $applySearch($dailyTodayBase);
         $applyStatus($dailyTodayBase);
@@ -151,17 +161,20 @@ class DashboardAdminController extends Controller
         ];
 
         // ✅ Donut GLOBAL all-time (DONE: hapus blocked & to_do)
-        $allStatusKeys = ['done','in_progress','pending','verification','rework','delayed','cancelled'];
+        $allStatusKeys = ['done', 'in_progress', 'pending', 'verification', 'rework', 'delayed', 'cancelled'];
         $statusCounts = [];
         foreach ($allStatusKeys as $sk) {
-            $q = JobdeskTask::query()->where('status', $sk);
+            $q = JobdeskTask::query()->where('status', $sk)
+                ->where(function ($q) {
+                    $q->where('is_template', 0)->orWhereNull('is_template');
+                });
             $applyDivision($q);
             $applySearch($q);
             $statusCounts[$sk] = $q->count();
         }
 
         // ===== Bulanan (global) =====
-        $userCols = ['id','name'];
+        $userCols = ['id', 'name'];
         if (Schema::hasColumn('users', 'division')) $userCols[] = 'division';
         if (Schema::hasColumn('users', 'divisi'))   $userCols[] = 'divisi';
 
@@ -169,17 +182,22 @@ class DashboardAdminController extends Controller
             ->with([
                 'photos',
                 'jobdesk:id,user_id,divisi,division',
-                'jobdesk.user' => function($q) use ($userCols) { $q->select($userCols); }
+                'jobdesk.user' => function ($q) use ($userCols) {
+                    $q->select($userCols);
+                }
             ])
-            ->where(function($q) use ($startMonth,$endMonth){
+            ->where(function ($q) use ($startMonth, $endMonth) {
                 $q->whereBetween(DB::raw('DATE(schedule_date)'), [
-                        $startMonth->toDateString(),
-                        $endMonth->toDateString(),
-                    ])
-                  ->orWhere(function($qq) use ($startMonth,$endMonth){
-                      $qq->whereNull('schedule_date')
-                         ->whereBetween('created_at', [$startMonth, $endMonth]);
-                  });
+                    $startMonth->toDateString(),
+                    $endMonth->toDateString(),
+                ])
+                    ->orWhere(function ($qq) use ($startMonth, $endMonth) {
+                        $qq->whereNull('schedule_date')
+                            ->whereBetween('created_at', [$startMonth, $endMonth]);
+                    });
+            })
+            ->where(function ($q) {
+                $q->where('is_template', 0)->orWhereNull('is_template');
             });
 
         $applyDivision($tasksMonth);
@@ -189,10 +207,10 @@ class DashboardAdminController extends Controller
         $tasksMonth = $tasksMonth->get();
 
         $avgProgressMonthAll = $tasksMonth->count()
-            ? (int) round($tasksMonth->avg(fn ($x) => (int)($x->progress ?? 0)))
+            ? (int) round($tasksMonth->avg(fn($x) => (int)($x->progress ?? 0)))
             : 0;
 
-        $doneCountMonthAll = $tasksMonth->where('status','done')->count();
+        $doneCountMonthAll = $tasksMonth->where('status', 'done')->count();
 
         // Chart monthly
         $labels = [];
@@ -232,7 +250,7 @@ class DashboardAdminController extends Controller
         ];
 
         // ✅ Donut monthly 1 bulan (DONE: hapus blocked & to_do)
-        $statusOrder  = ['pending','in_progress','verification','rework','delayed','cancelled','done'];
+        $statusOrder  = ['pending', 'in_progress', 'verification', 'rework', 'delayed', 'cancelled', 'done'];
         $donutMonthly = array_fill_keys($statusOrder, 0);
         foreach ($tasksMonth as $t) {
             $s = strtolower((string)($t->status ?? ''));
@@ -241,16 +259,21 @@ class DashboardAdminController extends Controller
 
         // Activity feed
         $latestForFeed = JobdeskTask::query()
-            ->with(['jobdesk.user' => function($q) use ($userCols) { $q->select($userCols); }])
-            ->where(function($q) use ($startMonth,$endMonth){
+            ->with(['jobdesk.user' => function ($q) use ($userCols) {
+                $q->select($userCols);
+            }])
+            ->where(function ($q) use ($startMonth, $endMonth) {
                 $q->whereBetween(DB::raw('DATE(schedule_date)'), [
-                        $startMonth->toDateString(),
-                        $endMonth->toDateString(),
-                    ])
-                  ->orWhere(function($qq) use ($startMonth,$endMonth){
-                      $qq->whereNull('schedule_date')
-                         ->whereBetween('created_at', [$startMonth, $endMonth]);
-                  });
+                    $startMonth->toDateString(),
+                    $endMonth->toDateString(),
+                ])
+                    ->orWhere(function ($qq) use ($startMonth, $endMonth) {
+                        $qq->whereNull('schedule_date')
+                            ->whereBetween('created_at', [$startMonth, $endMonth]);
+                    });
+            })
+            ->where(function ($q) {
+                $q->where('is_template', 0)->orWhereNull('is_template');
             });
 
         $applyDivision($latestForFeed);
@@ -263,10 +286,10 @@ class DashboardAdminController extends Controller
         foreach ($latestForFeed as $t) {
             $title = (string)($t->judul ?? 'Aktivitas');
             $owner = optional(optional($t->jobdesk)->user)->name;
-            if ($owner) $title = $owner.' — '.$title;
+            if ($owner) $title = $owner . ' — ' . $title;
 
             $when = $t->created_at ? $t->created_at->copy()->timezone($appTz) : null;
-            $timeText = $when ? $when->format('d/m/Y H:i').' WIB • '.$when->copy()->locale(app()->getLocale())->diffForHumans() : '—';
+            $timeText = $when ? $when->format('d/m/Y H:i') . ' WIB • ' . $when->copy()->locale(app()->getLocale())->diffForHumans() : '—';
 
             $activityFeed[] = [
                 'icon'      => 'bi bi-check2-square',
@@ -278,7 +301,12 @@ class DashboardAdminController extends Controller
 
         // Latest tasks global
         $latestTasksGlobal = JobdeskTask::query()
-            ->with(['photos','jobdesk.user' => function($q) use ($userCols) { $q->select($userCols); }]);
+            ->with(['photos', 'jobdesk.user' => function ($q) use ($userCols) {
+                $q->select($userCols);
+            }])
+            ->where(function ($q) {
+                $q->where('is_template', 0)->orWhereNull('is_template');
+            });
 
         $applyDivision($latestTasksGlobal);
         $applySearch($latestTasksGlobal);

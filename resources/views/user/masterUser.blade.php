@@ -175,7 +175,7 @@
 
             <li class="nav-item">
                 <a class="nav-link collapsed" href="{{ route('dailyreport.user') }}">
-                    <i class="bi bi-journal-check"></i><span>Daily Summary</span>
+                    <i class="bi bi-journal-check"></i><span>Laporan Harian</span>
                 </a>
             </li>
 

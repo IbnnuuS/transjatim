@@ -1,100 +1,140 @@
-# Sistem Monitoring Kinerja & Pelaporan (E-Laporan)
+# 🚌 Sistem Monitoring Kinerja & Pelaporan (E-Laporan) - Trans Jatim
 
-Aplikasi manajemen tugas (Jobdesk) dan pelaporan harian/bulanan berbasis web untuk instansi, dikembangkan dengan **Laravel** dan **TailwindCSS**. Aplikasi ini mempermudah monitoring kinerja tim melalui sistem jobdesk harian, penugasan insidental, serta rekapitulasi laporan otomatis ke format PDF dengan kop surat resmi.
+![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Alpine.js](https://img.shields.io/badge/Alpine.js-8BC0D0?style=for-the-badge&logo=alpine.js&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-005C84?style=for-the-badge&logo=mysql&logoColor=white)
+
+Aplikasi berbasis web untuk manajemen tugas (Jobdesk), absensi, dan pelaporan harian/bulanan bagi tim **Trans Jatim**. Dikembangkan dengan **Laravel** dan **TailwindCSS**, sistem ini mempermudah monitoring kinerja karyawan, penugasan insidental, serta rekapitulasi laporan otomatis.
 
 ## 🚀 Fitur Utama
 
-### 🛠️ Manajemen Tugas (Jobdesk)
+### 👨‍💻 User / Teams
 
--   **Jobdesk Harian Berulang**: Template tugas harian yang otomatis muncul setiap hari.
--   **Status Tracking**: Status lengkap (`To Do`, `In Progress`, `Verification`, `Done`, dll).
--   **Bukti Kinerja**: Upload bukti foto dengan fitur **Crop 1:1** untuk kerapian.
--   **Validasi**: Sistem validasi pekerjaan oleh admin.
+-   **Jobdesk & Todo List**: Manajemen tugas harian dengan status tracking (`To Do`, `In Progress`, `Done`).
+-   **Recurring Tasks**: Template tugas yang otomatis muncul setiap hari (Reset harian).
+-   **Absensi (Attendance)**: Fitur _Punch In_ dan _Punch Out_ untuk mencatat kehadiran harian.
+-   **Laporan Harian (Daily Report)**: Form input kegiatan harian yang terintegrasi dengan jobdesk.
+-   **Riwayat & Rekap**: Melihat riwayat pekerjaan dan rekapitulasi bulanan.
+-   **Bukti Kinerja**: Upload foto bukti pekerjaan dengan fitur **Crop 1:1**.
 
-### 📋 Penugasan (Assignment)
+### 👮 Admin Dashboard
 
--   **Tugas Insidental**: Admin memberikan tugas khusus di luar jobdesk harian.
--   **Integrasi**: Tugas yang diselesaikan otomatis masuk ke laporan harian.
+-   **Monitoring Terpusat**: Dashboard statistik kinerja tim, kehadiran hari ini, dan grafik aktivitas.
+-   **Manajemen User (Teams)**: Kelola data karyawan/tim, roles, dan akses login.
+-   **Approval & Feedback**: Validasi bukti pekerjaan dan status tugas.
+-   **Jobdesk Management**: Membuat template tugas berulang dan memberikan tugas insidental (Assignments).
+-   **Laporan Otomatis**:
+    -   Export Laporan Harian (PDF/Excel)
+    -   Export Laporan Bulanan (PDF/Excel)
+-   **Pengaturan Jadwal**: Kelola hari libur dan jadwal kerja.
 
-### 📄 Pelaporan & Ekspor
-
--   **Laporan Harian (PDF)**: Generate laporan harian otomatis dengan statistik dan detail pekerjaan.
--   **Rekap Bulanan (PDF)**: Ringkasan kinerja bulanan dengan total kehadiran dan penyelesaian tugas.
--   **Format Resmi**: Layout laporan rapi menggunakan kop surat instansi (Customizable).
-
-### 👥 Manajemen Pengguna
-
--   **Multi-Role**: Admin & User.
--   **Manajemen Tim**: Kelola akun, divisi, dan data karyawan.
--   **Profile Management**: Update foto profil dengan crop tool, ganti password.
-
-## 💻 Tech Stack
+## 💻 Teknologi yang Digunakan
 
 -   **Backend**: [Laravel Framework](https://laravel.com)
--   **Frontend**: [Tailwind CSS](https://tailwindcss.com), [Alpine.js](https://alpinejs.dev)
--   **Asset Bundling**: [Vite](https://vitejs.dev)
--   **PDF Generation**: [laravel-dompdf](https://github.com/barryvdh/laravel-dompdf)
+-   **Frontend**: [Tailwind CSS](https://tailwindcss.com), [Alpine.js](https://alpinejs.dev) + Blade Templates
+-   **Build Tool**: [Vite](https://vitejs.dev)
+-   **PDF Generator**: [laravel-dompdf](https://github.com/barryvdh/laravel-dompdf)
+-   **Excel Export**: [Laravel Excel](https://laravel-excel.com/)
 -   **Database**: MySQL
 
-## ⚙️ Instalasi
+## ⚙️ Panduan Instalasi
 
-Ikuti langkah berikut untuk menjalankan project di komputer lokal Anda:
+Ikuti langkah-langkah berikut untuk menjalankan proyek ini di komputer lokal (Localhost):
 
-1.  **Clone Repository**
+### 1. Prasyarat
 
-    ```bash
-    git clone https://github.com/username/repo-name.git
-    cd repo-name
-    ```
+Pastikan Anda telah menginstal:
 
-2.  **Install Dependencies**
+-   PHP >= 8.2
+-   Composer
+-   Node.js & NPM
+-   MySQL
 
-    ```bash
-    composer install
-    npm install
-    ```
+### 2. Clone Repository
 
-3.  **Setup Environment**
-    Salin file `.env.example` ke `.env` dan sesuaikan konfigurasi database.
+```bash
+git clone https://github.com/IbnnuuS/transjatim.git
+cd transjatim
+```
 
-    ```bash
-    cp .env.example .env
-    php artisan key:generate
-    ```
+### 3. Install Dependencies
 
-4.  **Database Migration & Seeding**
+Install paket backend (PHP) dan frontend (JS):
 
-    ```bash
-    php artisan migrate --seed
-    ```
+```bash
+composer install
+npm install
+```
 
-5.  **Setup Storage**
-    Agar foto profil dan bukti pekerjaan bisa diakses publik.
+### 4. Konfigurasi Environment (.env)
 
-    ```bash
-    php artisan storage:link
-    ```
+Salin file `.env.example` menjadi `.env` dan atur koneksi database:
 
-6.  **Jalankan Aplikasi**
-    Buka dua terminal berbeda untuk menjalankan server PHP dan Vite (Hot Reload).
+```bash
+cp .env.example .env
+```
 
-    ```bash
-    # Terminal 1
-    php artisan serve
+Buka file `.env` dan sesuaikan:
 
-    # Terminal 2
-    npm run dev
-    ```
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=nama_database_anda
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-## 📸 Screenshots
+### 5. Generate Key & Migrasi Database
 
-_(Tambahkan screenshot aplikasi di sini nanti)_
+```bash
+php artisan key:generate
+php artisan migrate --seed
+```
 
-## 🔐 Keamanan
+> **Note:** Gunakan `--seed` jika ingin mengisi database dengan data dummy awal (Admin/User default).
 
--   **Role-based Access Control (RBAC)**: Middleware untuk membatasi akses Admin vs User.
--   **Authorization Checks**: Proteksi ganda pada controller untuk mencegah _Privilege Escalation_ dan _IDOR_.
+### 6. Setup Storage Link
+
+Agar file upload (foto profil, bukti kerja) dapat diakses publik:
+
+```bash
+php artisan storage:link
+```
+
+### 7. Jalankan Aplikasi
+
+Jalankan server Laravel dan Vite secara bersamaan (buka 2 terminal):
+
+**Terminal 1 (Laravel Server):**
+
+```bash
+php artisan serve
+```
+
+**Terminal 2 (Vite Hot Reload):**
+
+```bash
+npm run dev
+```
+
+Akses aplikasi di: `http://localhost:8000`
+
+## 🔐 Akun Demo (Jika Menggunakan Seeding)
+
+-   **Admin**: `admin@example.com` / `password`
+-   **User**: `user@example.com` / `password`
+    _(Sesuaikan dengan data di `database/seeders/DatabaseSeeder.php`)_
+
+## 🤝 Kontribusi
+
+1.  Fork repository ini
+2.  Buat branch fitur baru (`git checkout -b fitur-baru`)
+3.  Commit perubahan (`git commit -m 'Menambahkan fitur xyz'`)
+4.  Push ke branch (`git push origin fitur-baru`)
+5.  Buat Pull Request
 
 ## 📝 Lisensi
 
-Project ini dilisensikan di bawah [MIT license](https://opensource.org/licenses/MIT).
+Project ini dilisensikan di bawah [MIT License](https://opensource.org/licenses/MIT).

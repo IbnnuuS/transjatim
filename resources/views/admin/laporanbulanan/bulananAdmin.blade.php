@@ -25,7 +25,9 @@
         if (!function_exists('extractFirstUrl')) {
             function extractFirstUrl(?string $text): ?string
             {
-                if (!$text) return null;
+                if (!$text) {
+                    return null;
+                }
                 if (preg_match('/https?:\/\/[^\s"]+/i', $text, $m)) {
                     return $m[0];
                 }
@@ -35,11 +37,11 @@
     @endphp
 
     <div class="pagetitle">
-        <h1>Rekap Pekerjaan</h1>
+        <h1>Rekap Bulanan</h1>
         <nav>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
-                <li class="breadcrumb-item active">Rekap Pekerjaan</li>
+                <li class="breadcrumb-item active">Rekap Bulanan</li>
             </ol>
         </nav>
     </div>
@@ -47,7 +49,7 @@
     <section class="section dashboard">
         <div class="card shadow-sm">
             <div class="card-body">
-                <h5 class="card-title">Filter Rekap Pekerjaan</h5>
+                <h5 class="card-title">Filter Rekap Bulanan</h5>
 
                 <form method="GET" action="{{ route('admin.laporan-bulanan.index') }}"
                     class="row g-2 mb-3 align-items-end">
@@ -57,7 +59,8 @@
                         <label class="form-label small fw-bold">Bulan</label>
                         <select class="form-select" name="month">
                             @php $currM = (int) ($filters['month'] ?? date('n')); @endphp
-                            <option value="" disabled {{ empty($filters['month']) ? 'selected' : '' }}>Pilih Bulan</option>
+                            <option value="" disabled {{ empty($filters['month']) ? 'selected' : '' }}>Pilih Bulan
+                            </option>
                             @foreach (range(1, 12) as $m)
                                 @php
                                     $mName = \Carbon\Carbon::createFromDate(null, $m, 1)->translatedFormat('F');
@@ -76,7 +79,7 @@
                             @php
                                 $currY = (int) ($filters['year'] ?? date('Y'));
                                 $startY = 2020;
-                                $endY   = 2050;
+                                $endY = 2050;
                             @endphp
                             @foreach (range($endY, $startY) as $y)
                                 <option value="{{ $y }}" {{ $currY == $y ? 'selected' : '' }}>
@@ -105,8 +108,10 @@
                         <label class="form-label small fw-bold">Divisi</label>
                         <select class="form-select" name="division">
                             <option value="">Semua Divisi</option>
-                            <option value="teknik" {{ ($filters['division'] ?? '') == 'teknik' ? 'selected' : '' }}>Teknik</option>
-                            <option value="digital" {{ ($filters['division'] ?? '') == 'digital' ? 'selected' : '' }}>Digital</option>
+                            <option value="teknik" {{ ($filters['division'] ?? '') == 'teknik' ? 'selected' : '' }}>Teknik
+                            </option>
+                            <option value="digital" {{ ($filters['division'] ?? '') == 'digital' ? 'selected' : '' }}>
+                                Digital</option>
                             <option value="customer service"
                                 {{ ($filters['division'] ?? '') == 'customer service' ? 'selected' : '' }}>
                                 Customer Service
@@ -120,7 +125,8 @@
                         <select class="form-select" name="status">
                             <option value="">Semua Status</option>
                             @foreach (['pending', 'in_progress', 'verification', 'rework', 'delayed', 'cancelled', 'done'] as $s)
-                                <option value="{{ $s }}" {{ ($filters['status'] ?? '') == $s ? 'selected' : '' }}>
+                                <option value="{{ $s }}"
+                                    {{ ($filters['status'] ?? '') == $s ? 'selected' : '' }}>
                                     {{ ucfirst(str_replace('_', ' ', $s)) }}
                                 </option>
                             @endforeach
@@ -177,7 +183,7 @@
                                     $jam =
                                         ($t->start_time ?? null) && ($t->end_time ?? null)
                                             ? $t->start_time . ' - ' . $t->end_time
-                                            : ($t->start_time ?? '—');
+                                            : $t->start_time ?? '—';
 
                                     $judul = $t->judul ?? '-';
                                     $nama = $t->jobdesk?->user?->name ?? '—';
@@ -195,10 +201,11 @@
 
                                     // ✅ bukti link fleksibel
                                     $proofLink =
-                                        ($t->proof_link ?? null)
-                                        ?? extractFirstUrl($t->result ?? null)
-                                        ?? extractFirstUrl($t->detail ?? null)
-                                        ?? extractFirstUrl($t->shortcoming ?? null);
+                                        $t->proof_link ??
+                                        null ??
+                                        (extractFirstUrl($t->result ?? null) ??
+                                            (extractFirstUrl($t->detail ?? null) ??
+                                                extractFirstUrl($t->shortcoming ?? null)));
 
                                     if ($proofLink && !preg_match('/^https?:\/\//i', $proofLink)) {
                                         $proofLink = null;
@@ -231,10 +238,8 @@
 
                                     {{-- ✅ LAPORAN HIDDEN --}}
                                     <td>
-                                        <button class="btn btn-sm btn-outline-primary"
-                                            type="button"
-                                            data-bs-toggle="collapse"
-                                            data-bs-target="#{{ $collapseId }}">
+                                        <button class="btn btn-sm btn-outline-primary" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#{{ $collapseId }}">
                                             <i class="bi bi-eye me-1"></i> Lihat
                                         </button>
 
@@ -249,7 +254,7 @@
 
                                     {{-- ✅ BUKTI --}}
                                     <td>
-                                        @if($proofLink)
+                                        @if ($proofLink)
                                             <a href="{{ $proofLink }}" target="_blank" rel="noopener"
                                                 class="btn btn-sm btn-outline-success">
                                                 <i class="bi bi-link-45deg me-1"></i> Buka

@@ -22,6 +22,9 @@ class JobdeskAdminController extends Controller
 
         $buildQuery = function () use ($q, $userId, $divisi, $date) {
             return JobdeskTask::query()
+                ->where(function ($w) {
+                    $w->where('is_template', 0)->orWhereNull('is_template');
+                })
                 ->when($q !== '', function ($qq) use ($q) {
                     $qq->where(function ($w) use ($q) {
                         $w->where('judul', 'like', "%{$q}%")

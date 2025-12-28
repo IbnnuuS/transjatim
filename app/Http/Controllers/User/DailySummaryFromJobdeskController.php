@@ -192,6 +192,9 @@ class DailySummaryFromJobdeskController extends Controller
             ->with(['photos', 'jobdesk.user'])
             ->whereHas('jobdesk', fn($q) => $q->where('user_id', (int)$selectedId))
             ->whereDate('schedule_date', $pickedYmd)
+            ->where(function ($q) {
+                $q->where('is_template', 0)->orWhereNull('is_template');
+            })
             ->get();
 
         // Map JobdeskTasks common fields
